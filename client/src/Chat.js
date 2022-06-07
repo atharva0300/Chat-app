@@ -1,45 +1,36 @@
-import React from 'react'
-import { useEffect } from 'react';
-import { useState } from 'react';
-import ScrollToBottom from 'react-scroll-to-bottom';
+import React, { useEffect, useState } from "react";
+import ScrollToBottom from "react-scroll-to-bottom";
 
-function Chat({socket, username , room}) {
+function Chat({ socket, username, room }) {
+  const [currentMessage, setCurrentMessage] = useState("");
+  const [messageList, setMessageList] = useState([]);
 
-    const [currentMessage , setCurrentMessage] = useState("");
-    const [messageList, setMessageList] = useState([]);
-    
-    const sendMessage = async () => {
-        if(currentMessage !== ""){
-            // if the chart message is not empty then 
-            
-            // creating a new object of the data
-            const messageData = {
-                room : room,
-                author : username,
-                message : currentMessage,
-                time : new Date(Date.now()).getHours() + ":" + new Date(Date.now()).getMinutes()
-            }
+  const sendMessage = async () => {
+    if (currentMessage !== "") {
+      const messageData = {
+        room: room,
+        author: username,
+        message: currentMessage,
+        time:
+          new Date(Date.now()).getHours() +
+          ":" +
+          new Date(Date.now()).getMinutes(),
+      };
 
-            // this will send the messageData object to the server 
-            await socket.emit('send_message' , messageData);
-            setMessageList((list) => [...list, messageData]);
-            setCurrentMessage("");
-        }
+      await socket.emit("send_message", messageData);
+      setMessageList((list) => [...list, messageData]);
+      setCurrentMessage("");
     }
+  };
 
-    useEffect(() => {
-        
-        // getting or listening the data from the server
-        socket.on('receive_message' , (data) => {
-
-        setMessageList((list) => [...list, data]);
-        })
-    } , [socket]);
-    // listen and re render when there is any change in the socket
+  useEffect(() => {
+    socket.on("receive_message", (data) => {
+      setMessageList((list) => [...list, data]);
+    });
+  }, [socket]);
 
   return (
-    <div>
-        <div className="chat-window">
+    <div className="chat-window">
       <div className="chat-header">
         <p>Live Chat</p>
       </div>
@@ -80,8 +71,7 @@ function Chat({socket, username , room}) {
         <button onClick={sendMessage}>&#9658;</button>
       </div>
     </div>
-    </div>
-  )
+  );
 }
 
-export default Chat
+export default Chat;
